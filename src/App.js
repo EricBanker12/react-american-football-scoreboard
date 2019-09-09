@@ -9,22 +9,29 @@ function App(props) {
   const [awayScore, setAwayScore] = useState(0)
   const [quarter, setQuarter] = useState(1)
   const [time, setTime] = useState(0)
+  const [paused, setPaused] = useState(true)
 
   function scoreHandler(name, inc) {
-    if (name == props.home) {
+    if (name === props.home) {
       setHomeScore(homeScore + inc)
     }
-    if (name == props.away) {
+    if (name === props.away) {
       setAwayScore(awayScore + inc)
     }
   }
 
   useEffect(()=>{ // do stuff after render
     let interval = setInterval(()=>{ // set timer to count seconds
-        if (time < 15 * 60) setTime(time+1) // if less than 15 minutes, keep counting
+        if (!paused) {
+            if (time < 15 * 60) setTime(time+1) // if less than 15 minutes, keep counting
+            else { // pause timer at end of quarter
+                setPaused(true)
+                clearInterval(interval)
+            }
+        }
     }, 1000)
     return ()=>{clearInterval(interval)} // remove old timer on new render ()
-  },[time]) // trigger if time changes (so rendering other changes does not pause timer)
+  },[time,paused]) // trigger if time changes (so rendering other changes does not pause timer)
 
   return (
     <div className="container">
@@ -57,6 +64,7 @@ function App(props) {
         </div>
         <div>
           <button className="nextQuarterButton" onClick={()=>{setQuarter(quarter<4?quarter+1:1); setTime(0)}}>Next Quarter</button>
+          <button className="timerButton" onClick={()=>{setPaused(!paused)}}>{paused?'Start Timer':'Pause Timer'}</button>
         </div>
       </section>
     </div>

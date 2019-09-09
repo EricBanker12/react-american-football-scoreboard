@@ -117,7 +117,8 @@
 .homeButtons__fieldGoal,
 .awayButtons__touchdown,
 .awayButtons__fieldGoal,
-.nextQuarterButton {
+.nextQuarterButton,
+.timerButton {
   margin: 1rem;
   border-radius: 4px;
 }
