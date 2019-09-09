@@ -1,5 +1,5 @@
 //TODO: STEP 1 - Import the useState hook.
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./App.css";
 import BottomRow from "./BottomRow";
 
@@ -8,6 +8,7 @@ function App(props) {
   const [homeScore, setHomeScore] = useState(0)
   const [awayScore, setAwayScore] = useState(0)
   const [quarter, setQuarter] = useState(1)
+  const [time, setTime] = useState(0)
 
   function scoreHandler(name, inc) {
     if (name == props.home) {
@@ -17,6 +18,13 @@ function App(props) {
       setAwayScore(awayScore + inc)
     }
   }
+
+  useEffect(()=>{ // do stuff after render
+    let interval = setInterval(()=>{ // set timer to count seconds
+        if (time < 15 * 60) setTime(time+1) // if less than 15 minutes, keep counting
+    }, 1000)
+    return ()=>{clearInterval(interval)} // remove old timer on new render ()
+  },[time]) // trigger if time changes (so rendering other changes does not pause timer)
 
   return (
     <div className="container">
@@ -29,7 +37,7 @@ function App(props) {
 
             <div className="home__score">{homeScore}</div>
           </div>
-          <div className="timer">00:03</div>
+          <div className="timer">{Math.floor(time/60)<10?'0'+Math.floor(time/60):Math.floor(time/60)}:{time%60<10?'0'+time%60:time%60}</div>
           <div className="away">
             <h2 className="away__name">{props.away}</h2>
             <div className="away__score">{awayScore}</div>
@@ -47,7 +55,9 @@ function App(props) {
           <button className="awayButtons__touchdown" onClick={()=>{scoreHandler(props.away, 7)}}>Away Touchdown</button>
           <button className="awayButtons__fieldGoal" onClick={()=>{scoreHandler(props.away, 3)}}>Away Field Goal</button>
         </div>
-        <button className="nextQuarterButton" onClick={()=>{setQuarter(quarter<4?quarter+1:1)}}>Next Quarter</button>
+        <div>
+          <button className="nextQuarterButton" onClick={()=>{setQuarter(quarter<4?quarter+1:1); setTime(0)}}>Next Quarter</button>
+        </div>
       </section>
     </div>
   );
